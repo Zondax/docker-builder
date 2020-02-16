@@ -13,7 +13,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #*******************************************************************************
-# Based on https://www.yoctoproject.org/docs/2.0/yocto-project-qs/yocto-project-qs.html
 FROM ubuntu:18.04
 
 RUN apt-get update && \
@@ -28,35 +27,54 @@ RUN apt-get update && \
         xdg-utils xterm xz-utils zlib1g-dev
 
 RUN apt-get update && \
-    apt-get -y install repo ccache sudo build-essential libgmp3-dev python3-dev python-dev \
-    python3-pip python-pip wget cpio
+    apt-get -y install repo ccache sudo locales build-essential libgmp3-dev python3-dev python-dev \
+    python3-pip python-pip wget cpio gdisk tmux zsh vim nano
+
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8
+ENV LANG en_US.UTF-8
+RUN chsh -s $(which zsh)
+
+# Fetch latest repo tool
+RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo \
+        && chmod a+x /usr/bin/repo
 
 RUN pip3 install pycryptodomex
 RUN pip install pycryptodomex
 
 ####################################
 ####################################
-# Create test user
-RUN adduser --disabled-password --gecos "" -u 1000 test
-RUN echo "test ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-WORKDIR /home/test
-USER test
-ADD entrypoint.sh /home/test/entrypoint.sh
+# Create zondax user
+RUN adduser --disabled-password --gecos "" -u 1000 --shell /usr/bin/zsh zondax
+RUN echo "zondax ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /home/zondax
+USER zondax
+RUN git config --global user.email "info@zondax.ch"
+RUN git config --global user.name "zondax"
+RUN git config --global color.ui true
+
+ENV ZSH_THEME agnoster
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ""  --unattended
+RUN cd $HOME; \
+    git clone https://github.com/gpakosz/.tmux.git; \
+    ln -s -f .tmux/.tmux.conf ; \
+    cp .tmux/.tmux.conf.local .
+
+ADD entrypoint.sh /home/zondax/entrypoint.sh
+ENTRYPOINT ["/home/zondax/entrypoint.sh"]
 
 ####################################
 ####################################
 
 ENV TARGET default
-RUN mkdir -p tztest
-RUN cd tztest && \
+RUN mkdir -p optee
+RUN cd optee && \
     repo init -u https://github.com/OP-TEE/manifest.git -m ${TARGET}.xml && \
     repo sync -j4 --no-clone-bundle
 
-RUN cd tztest/build && make -j `nproc` toolchains
-RUN cd tztest/build && make -j `nproc`
+RUN cd optee/build && make -j `nproc` toolchains
+RUN cd optee/build && make -j `nproc`
 
-ADD install.sh /home/test/install.sh
-RUN /home/test/install.sh
-
-# START SCRIPT
-ENTRYPOINT ["/home/test/entrypoint.sh"]
+RUN sudo apt-get update && \
+    sudo apt-get -y install net-tools x11-apps

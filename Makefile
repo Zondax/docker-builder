@@ -3,7 +3,7 @@ DOCKER_IMAGE="zondax/docker-optee"
 define run_docker
 	docker run -it --rm \
 	--privileged \
-	-u $(shell id -u) \
+	-u $(shell id -u):$(shell id -g) \
 	-v $(shell pwd):/project \
 	-e DISPLAY=$(shell echo ${DISPLAY}) \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
@@ -24,3 +24,6 @@ pull:
 
 shell:
 	$(call run_docker,bash)
+
+test:
+	$(call run_docker,xterm)
