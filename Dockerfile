@@ -1,12 +1,12 @@
 #*******************************************************************************
 #    (c) 2020 ZondaX GmbH
-# 
+#
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
-# 
+#
 #       http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #   Unless required by applicable law or agreed to in writing, software
 #   distributed under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,20 +61,26 @@ RUN cd $HOME; \
     ln -s -f .tmux/.tmux.conf ; \
     cp .tmux/.tmux.conf.local .
 
-ADD entrypoint.sh /home/zondax/entrypoint.sh
-ENTRYPOINT ["/home/zondax/entrypoint.sh"]
-
 ####################################
 ####################################
 
 ENV TARGET default
 RUN mkdir -p optee
 RUN cd optee && \
-    repo init -u https://github.com/OP-TEE/manifest.git -m ${TARGET}.xml && \
-    repo sync -j4 --no-clone-bundle
+    repo init --depth=1 -u https://github.com/OP-TEE/manifest.git -m ${TARGET}.xml && \
+    repo sync -c -j$(nproc --all)
 
 RUN cd optee/build && make -j `nproc` toolchains
 RUN cd optee/build && make -j `nproc`
 
 RUN sudo apt-get update && \
-    sudo apt-get -y install net-tools x11-apps
+    sudo apt-get -y install net-tools x11-apps dbus-x11 gnome-terminal libcanberra-gtk-module libcanberra-gtk3-module dconf-editor
+
+ENV NO_AT_BRIDGE 1
+#RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+
+
+####################################
+####################################
+ADD entrypoint.sh /home/zondax/entrypoint.sh
+ENTRYPOINT ["/home/zondax/entrypoint.sh"]
