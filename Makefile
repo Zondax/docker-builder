@@ -24,9 +24,8 @@ endef
 build:
 	docker build --rm -f Dockerfile $(TTY_SETTING) $(DOCKER_IMAGE) .
 
-publish:
+publish: build
 	docker login
-	docker build --rm -f Dockerfile $(TTY_SETTING) $(DOCKER_IMAGE) .
 	docker push $(DOCKER_IMAGE)
 
 pull:
@@ -34,6 +33,3 @@ pull:
 
 shell: build
 	$(call run_docker,zsh)
-
-test:
-	$(call run_docker,xterm)

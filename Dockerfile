@@ -71,14 +71,17 @@ RUN cd optee && \
     repo sync -c -j$(nproc --all)
 
 RUN cd optee/build && make -j `nproc` toolchains
-RUN cd optee/build && make -j `nproc`
+RUN cd optee/build && make -j `nproc` QEMU_VIRTFS_ENABLE=y QEMU_USERNET_ENABLE=y
 
 RUN sudo apt-get update && \
-    sudo apt-get -y install net-tools x11-apps dbus-x11 gnome-terminal libcanberra-gtk-module libcanberra-gtk3-module dconf-editor
-
+    sudo apt-get -y install net-tools x11-apps gnome-terminal libcanberra-gtk-module libcanberra-gtk3-module dbus-x11 dconf-editor
 ENV NO_AT_BRIDGE 1
-#RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
+# Install Rust
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.zshrc
+RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.bashrc
+RUN $HOME/.cargo/bin/rustup target add armv7-unknown-linux-gnueabihf
 
 ####################################
 ####################################
