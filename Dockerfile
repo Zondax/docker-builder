@@ -1,5 +1,5 @@
 #*******************************************************************************
-#    (c) 2020 ZondaX GmbH
+#    (c) 2020 Zondax GmbH
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -65,10 +65,12 @@ RUN cd $HOME; \
 ####################################
 
 ENV TARGET default
+ENV OPTEE_URL https://github.com/OP-TEE/manifest.git
+
 RUN mkdir -p optee
 RUN cd optee && \
-    repo init --depth=1 -u https://github.com/OP-TEE/manifest.git -m ${TARGET}.xml && \
-    repo sync -c -j$(nproc --all)
+    repo init --depth=1 -u ${OPTEE_URL} -m ${TARGET}.xml && \
+    repo sync -c -j$(nproc --all) --no-clone-bundle
 
 RUN cd optee/build && make -j `nproc` toolchains
 RUN cd optee/build && make -j `nproc` QEMU_VIRTFS_ENABLE=y QEMU_USERNET_ENABLE=y
