@@ -28,8 +28,8 @@ ENV NO_AT_BRIDGE 1
 # Build OPTEE & QEMU
 RUN mkdir -p optee
 RUN cd optee && \
-    repo init --depth=1 -u ${OPTEE_URL} -m ${TARGET}.xml && \
-    repo sync -c -j$(nproc --all) --no-clone-bundle
+    repo init --depth=1 --no-clone-bundle -u ${OPTEE_URL} -m ${TARGET}.xml && \
+    repo sync -c -j$(nproc --all) --fetch-submodules --current-branch --no-clone-bundle
 RUN cd optee/build && make -j `nproc` toolchains
 RUN cd optee/build && make -j `nproc` QEMU_VIRTFS_ENABLE=y QEMU_USERNET_ENABLE=y
 

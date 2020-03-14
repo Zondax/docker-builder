@@ -1,6 +1,6 @@
 DOCKER_IMAGE_PREFIX=zondax/builder
 DOCKER_IMAGE_BASE=${DOCKER_IMAGE_PREFIX}-base
-DOCKER_IMAGE_QEMU=${DOCKER_IMAGE_PREFIX}-qemu
+DOCKER_IMAGE_QEMUV7=${DOCKER_IMAGE_PREFIX}-qemuv7
 DOCKER_IMAGE_YOCTO=${DOCKER_IMAGE_PREFIX}-yocto
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
@@ -18,18 +18,21 @@ default: build
 build:
 	cd base  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BASE) .
 	cd yocto && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_YOCTO) .
-#	cd qemu  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMU) .
+	cd qemuv7  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV7) .
+	cd qemuv8  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV8) .
 
 publish: build
 	docker login
 	docker push $(DOCKER_IMAGE_BASE)
 	docker push $(DOCKER_IMAGE_YOCTO)
-	# docker push $(DOCKER_IMAGE_QEMU)
+	docker push $(DOCKER_IMAGE_QEMUV7)
+	docker push $(DOCKER_IMAGE_QEMUV8)
 
 pull:
 	docker pull $(DOCKER_IMAGE_BASE)
-	# docker pull $(DOCKER_IMAGE_QEMU)
-	# docker pull $(DOCKER_IMAGE_YOCTO)
+	docker pull $(DOCKER_IMAGE_YOCTO)
+	docker pull $(DOCKER_IMAGE_QEMUV7)
+	docker pull $(DOCKER_IMAGE_QEMUV8)
 
 define run_docker
 	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) --rm \
@@ -48,5 +51,8 @@ shell_base: build
 shell_yocto: build
 	$(call run_docker,$(DOCKER_IMAGE_YOCTO),zsh)
 
-shell_qemu: build
-	$(call run_docker,$(DOCKER_IMAGE_QEMU),zsh)
+shell_qemuv7: build
+	$(call run_docker,$(DOCKER_IMAGE_QEMUV7),zsh)
+
+shell_qemuv8: build
+	$(call run_docker,$(DOCKER_IMAGE_QEMUV8),zsh)
