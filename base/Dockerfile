@@ -15,45 +15,129 @@
 #*******************************************************************************
 FROM ubuntu:18.04
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND="noninteractive" \
-    apt-get -y install android-tools-adb android-tools-fastboot autoconf \
-        automake bc bison build-essential ccache cscope curl device-tree-compiler \
-        expect flex ftp-upload gdisk iasl libattr1-dev libc6 libcap-dev \
-        libfdt-dev libftdi-dev libglib2.0-dev libhidapi-dev libncurses5-dev \
-        libpixman-1-dev libssl-dev libstdc++6 libtool libz1 make \
-        mtools netcat python-crypto python3-crypto python-pyelftools \
-        python3-pyelftools python-serial python3-serial rsync unzip uuid-dev \
-        xdg-utils xterm xz-utils zlib1g-dev
+ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update && \
-    apt-get -y install repo ccache sudo locales build-essential libgmp3-dev python3-dev python-dev \
-    python3-pip python-pip wget cpio gdisk tmux zsh vim nano
+    apt-get -y install \
+    \
+    android-tools-adb \ 
+    android-tools-fastboot \ 
+    autoconf \ 
+    automake \ 
+    bc \ 
+    bison \ 
+    bsdmainutils \ 
+    build-essential \
+    ccache \ 
+    chrpath \ 
+    coreutils \ 
+    corkscrew \ 
+    cpio \ 
+    cscope \ 
+    curl \ 
+    cvs \ 
+    desktop-file-utils \ 
+    device-tree-compiler \ 
+    diffstat \ 
+    docbook \ 
+    docbook-utils \ 
+    dos2unix \ 
+    expect \ 
+    flex \ 
+    ftp-upload \ 
+    g++ \ 
+    gawk \ 
+    gcc \ 
+    gcc-multilib \ 
+    gdisk \ 
+    git \
+    git-core \ 
+    help2man \ 
+    iasl \ 
+    iputils-ping \ 
+    lib32ncurses5 \ 
+    libarchive-zip-perl \ 
+    libattr1-dev \ 
+    libc6 \ 
+    libcap-dev \ 
+    libfdt-dev \ 
+    libftdi-dev \ 
+    libglib2.0-dev \ 
+    libgmp3-dev \ 
+    libhidapi-dev \ 
+    libncurses5-dev \ 
+    libncursesw5-dev \ 
+    libpixman-1-dev \ 
+    libsdl1.2-dev \ 
+    libssl-dev \ 
+    libstdc++6 \ 
+    libtool \ 
+    libxml2-utils \ 
+    libz1 \ 
+    linux-headers-generic \ 
+    locales \ 
+    lrzsz \ 
+    make \ 
+    mercurial \ 
+    mtools \ 
+    nano \
+    ncurses-dev \ 
+    netcat \ 
+    python-crypto \ 
+    python-dev \
+    python-pip \
+    python-pycryptopp \ 
+    python-pyelftools \ 
+    python-pysqlite2 \ 
+    python-serial \ 
+    python-wand \ 
+    python3 \ 
+    python3-crypto \ 
+    python3-dev \ 
+    python3-pip \
+    python3-pyelftools \ 
+    python3-serial \ 
+    repo \ 
+    rsync \
+    sed \ 
+    subversion \ 
+    sudo \ 
+    texi2html \ 
+    texinfo \ 
+    tmux \ 
+    u-boot-tools \ 
+    unzip \ 
+    uuid-dev \ 
+    vim \ 
+    wget \
+    xdg-utils \ 
+    xmlto \ 
+    xterm \ 
+    xz-utils \ 
+    zlib1g-dev \ 
+    zsh
 
+# Fix locale issues
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
 ENV LANG en_US.UTF-8
-RUN chsh -s $(which zsh)
 
 # Fetch latest repo tool
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo \
         && chmod a+x /usr/bin/repo
 
-RUN pip3 install pycryptodomex
-RUN pip install pycryptodomex
+# Change default shell
+RUN chsh -s $(which zsh)
 
-####################################
-####################################
 # Create zondax user
 RUN adduser --disabled-password --gecos "" -u 1000 --shell /usr/bin/zsh zondax
 RUN echo "zondax ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-WORKDIR /home/zondax
+
 USER zondax
 RUN git config --global user.email "info@zondax.ch"
 RUN git config --global user.name "zondax"
 RUN git config --global color.ui true
-
 ENV ZSH_THEME agnoster
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ""  --unattended
 RUN cd $HOME; \
@@ -61,31 +145,10 @@ RUN cd $HOME; \
     ln -s -f .tmux/.tmux.conf ; \
     cp .tmux/.tmux.conf.local .
 
-####################################
-####################################
-
-ENV TARGET default
-ENV OPTEE_URL https://github.com/OP-TEE/manifest.git
-
-RUN mkdir -p optee
-RUN cd optee && \
-    repo init --depth=1 -u ${OPTEE_URL} -m ${TARGET}.xml && \
-    repo sync -c -j$(nproc --all) --no-clone-bundle
-
-RUN cd optee/build && make -j `nproc` toolchains
-RUN cd optee/build && make -j `nproc` QEMU_VIRTFS_ENABLE=y QEMU_USERNET_ENABLE=y
-
-RUN sudo apt-get update && \
-    sudo apt-get -y install net-tools x11-apps gnome-terminal libcanberra-gtk-module libcanberra-gtk3-module dbus-x11 dconf-editor
-ENV NO_AT_BRIDGE 1
-
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.zshrc
 RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.bashrc
-RUN $HOME/.cargo/bin/rustup target add armv7-unknown-linux-gnueabihf
+RUN $HOME/.cargo/bin/rustup target add all
 
-####################################
-####################################
-ADD entrypoint.sh /home/zondax/entrypoint.sh
-ENTRYPOINT ["/home/zondax/entrypoint.sh"]
+USER root

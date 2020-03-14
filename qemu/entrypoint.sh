@@ -3,7 +3,7 @@ trap "exit" SIGTERM SIGINT
 
 echo
 echo "--------------------------------------"
-echo "Zondax OPTEE container - zondax.ch"
+echo "Zondax OPTEE-QEMU - zondax.ch"
 echo "--------------------------------------"
 echo
 
@@ -17,4 +17,4 @@ dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/
 
 source $HOME/.cargo/env
 
-bash -c "trap 'exit' SIGTERM SIGINT; $@"
+zsh -c "trap 'exit' SIGTERM SIGINT; $@"

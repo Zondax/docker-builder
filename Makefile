@@ -1,4 +1,7 @@
-DOCKER_IMAGE="zondax/docker-optee"
+DOCKER_IMAGE_PREFIX=zondax/builder
+DOCKER_IMAGE_BASE=${DOCKER_IMAGE_PREFIX}-base
+DOCKER_IMAGE_QEMU=${DOCKER_IMAGE_PREFIX}-qemu
+DOCKER_IMAGE_YOCTO=${DOCKER_IMAGE_PREFIX}-yocto
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 
@@ -10,6 +13,24 @@ INTERACTIVE_SETTING:=
 TTY_SETTING:=
 endif
 
+default: build
+
+build:
+	cd base  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BASE) .
+	cd yocto && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_YOCTO) .
+#	cd qemu  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMU) .
+
+publish: build
+	docker login
+	docker push $(DOCKER_IMAGE_BASE)
+	docker push $(DOCKER_IMAGE_YOCTO)
+	# docker push $(DOCKER_IMAGE_QEMU)
+
+pull:
+	docker pull $(DOCKER_IMAGE_BASE)
+	# docker pull $(DOCKER_IMAGE_QEMU)
+	# docker pull $(DOCKER_IMAGE_YOCTO)
+
 define run_docker
 	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) --rm \
 	--privileged \
@@ -17,19 +38,15 @@ define run_docker
 	-v $(shell pwd):/project \
 	-e DISPLAY=$(shell echo ${DISPLAY}) \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-	$(DOCKER_IMAGE) \
-	"$(1)"
+	$(1) \
+	"$(2)"
 endef
 
-build:
-	docker build --rm -f Dockerfile $(TTY_SETTING) $(DOCKER_IMAGE) .
+shell_base: build
+	$(call run_docker,$(DOCKER_IMAGE_BASE),zsh)
 
-publish: build
-	docker login
-	docker push $(DOCKER_IMAGE)
+shell_yocto: build
+	$(call run_docker,$(DOCKER_IMAGE_YOCTO),zsh)
 
-pull:
-	docker pull $(DOCKER_IMAGE)
-
-shell: build
-	$(call run_docker,zsh)
+shell_qemu: build
+	$(call run_docker,$(DOCKER_IMAGE_QEMU),zsh)
