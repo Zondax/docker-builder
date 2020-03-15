@@ -149,6 +149,8 @@ RUN cd $HOME; \
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.zshrc
 RUN echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $HOME/.bashrc
-RUN $HOME/.cargo/bin/rustup target add all
+RUN $HOME/.cargo/bin/rustup target add armv7-unknown-linux-gnueabihf
+RUN $HOME/.cargo/bin/rustup target add aarch64-unknown-linux-gnu
+RUN $HOME/.cargo/bin/rustup target add aarch64-unknown-linux-musl
 
 USER root
