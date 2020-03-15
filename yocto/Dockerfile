@@ -21,6 +21,9 @@ EXPOSE 8000
 USER zondax
 WORKDIR /home/zondax
 
+RUN sudo apt-get update && sudo apt-get -y install \
+    lbzip2
+
 ####################################
 ADD entrypoint.sh /home/zondax/entrypoint.sh
 ENTRYPOINT ["/home/zondax/entrypoint.sh"]

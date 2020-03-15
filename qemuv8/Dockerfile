@@ -40,7 +40,8 @@ RUN sudo apt-get update && sudo apt-get -y install \
     libcanberra-gtk-module \
     libcanberra-gtk3-module  \ 
     net-tools \
-    x11-apps
+    x11-apps \
+    lbzip2
 
 ####################################
 
