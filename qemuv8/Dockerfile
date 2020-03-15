@@ -21,8 +21,8 @@ RUN pip install pycryptodomex
 USER zondax
 WORKDIR /home/zondax
 
-ENV TARGET default
-ENV OPTEE_URL https://github.com/OP-TEE/qemu_v8.git
+ENV TARGET qemu_v8
+ENV OPTEE_URL https://github.com/OP-TEE/manifest.git
 ENV NO_AT_BRIDGE 1
 
 # Build OPTEE & QEMU
@@ -43,5 +43,8 @@ RUN sudo apt-get update && sudo apt-get -y install \
     x11-apps
 
 ####################################
+
+ENV QEMU_V8=1
+
 ADD entrypoint.sh /home/zondax/entrypoint.sh
 ENTRYPOINT ["/home/zondax/entrypoint.sh"]

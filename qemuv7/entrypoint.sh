@@ -3,7 +3,7 @@ trap "exit" SIGTERM SIGINT
 
 echo
 echo "--------------------------------------"
-echo "Zondax OPTEE-QEMU - zondax.ch"
+echo "Zondax OPTEE-QEMU ARMv7 - zondax.ch"
 echo "--------------------------------------"
 echo
 

@@ -43,5 +43,8 @@ RUN sudo apt-get update && sudo apt-get -y install \
     x11-apps
 
 ####################################
+
+ENV QEMU_V7=1
+
 ADD entrypoint.sh /home/zondax/entrypoint.sh
 ENTRYPOINT ["/home/zondax/entrypoint.sh"]
