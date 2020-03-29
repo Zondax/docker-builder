@@ -1,4 +1,4 @@
-# Docker Containers for Yocto/OPTEE
+# Docker Containers
 
 This respository includes the following containers:
 
