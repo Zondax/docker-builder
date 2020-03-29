@@ -3,6 +3,8 @@ DOCKER_IMAGE_BASE=${DOCKER_IMAGE_PREFIX}-base
 DOCKER_IMAGE_QEMUV7=${DOCKER_IMAGE_PREFIX}-qemuv7
 DOCKER_IMAGE_QEMUV8=${DOCKER_IMAGE_PREFIX}-qemuv8
 DOCKER_IMAGE_YOCTO=${DOCKER_IMAGE_PREFIX}-yocto
+DOCKER_IMAGE_BOLOS_BUILDER=zondax/ledger-docker-bolos
+DOCKER_IMAGE_BOLOS_EMU=${DOCKER_IMAGE_PREFIX}-bolos-emu
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 
@@ -21,6 +23,8 @@ build:
 	cd yocto && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_YOCTO) .
 	cd qemuv7  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV7) .
 	cd qemuv8  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV8) .
+	cd bolos-app-build  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_BUILDER) .
+	cd bolos-app-emu  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_EMU) .
 
 publish: build
 	docker login
@@ -28,12 +32,16 @@ publish: build
 	docker push $(DOCKER_IMAGE_YOCTO)
 	docker push $(DOCKER_IMAGE_QEMUV7)
 	docker push $(DOCKER_IMAGE_QEMUV8)
+	docker push $(DOCKER_IMAGE_BOLOS_BUILDER)
+	docker push $(DOCKER_IMAGE_BOLOS_EMU)
 
 pull:
 	docker pull $(DOCKER_IMAGE_BASE)
 	docker pull $(DOCKER_IMAGE_YOCTO)
 	docker pull $(DOCKER_IMAGE_QEMUV7)
 	docker pull $(DOCKER_IMAGE_QEMUV8)
+	docker pull $(DOCKER_IMAGE_BOLOS_BUILDER)
+	docker pull $(DOCKER_IMAGE_BOLOS_EMU)
 
 define run_docker
 	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) --rm \
@@ -57,3 +65,9 @@ shell_qemuv7: build
 
 shell_qemuv8: build
 	$(call run_docker,$(DOCKER_IMAGE_QEMUV8),zsh)
+
+shell_bolos_build: build
+	$(call run_docker,$(DOCKER_IMAGE_BOLOS_BUILDER),/bin/bash)
+
+shell_bolos_emu: build
+	$(call run_docker,$(DOCKER_IMAGE_BOLOS_EMU),/bin/bash)
