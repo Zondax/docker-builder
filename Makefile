@@ -20,14 +20,24 @@ endif
 
 default: build
 
-build:
+build: build_base build_yocto build_qemuv7 build_qemuv8 build_bolos_build \
+       build_bolos_emu build_circleci build_rustci
+
+build_base:
 	cd base  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BASE) .
+build_yocto:
 	cd yocto && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_YOCTO) .
-	cd qemuv7  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV7) .
+build_qemuv7:
+	cd qemuv7 && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV7) .
+build_qemuv8:
 	cd qemuv8  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV8) .
+build_bolos_build:
 	cd bolos-app-build  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_BUILDER) .
+build_bolos_emu:
 	cd bolos-app-emu  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_EMU) .
+build_circleci:
 	cd circleci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_CIRCLECI) .
+build_rustci:
 	cd rust-ci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_RUSTCI) .
 
 publish: build
