@@ -7,3 +7,5 @@ This respository includes the following containers:
 - ARMv8 QEMU + OPTEE
 - Bolos - app compiler
 - Bolos - app emulator (zondpeculos)
+- CircleCI - for CircleCI / C++ projects
+- Rust-CI  - for CircleCI / Rust projects

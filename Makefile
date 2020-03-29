@@ -3,8 +3,10 @@ DOCKER_IMAGE_BASE=${DOCKER_IMAGE_PREFIX}-base
 DOCKER_IMAGE_QEMUV7=${DOCKER_IMAGE_PREFIX}-qemuv7
 DOCKER_IMAGE_QEMUV8=${DOCKER_IMAGE_PREFIX}-qemuv8
 DOCKER_IMAGE_YOCTO=${DOCKER_IMAGE_PREFIX}-yocto
-DOCKER_IMAGE_BOLOS_BUILDER=zondax/ledger-docker-bolos
 DOCKER_IMAGE_BOLOS_EMU=${DOCKER_IMAGE_PREFIX}-bolos-emu
+DOCKER_IMAGE_BOLOS_BUILDER=zondax/ledger-docker-bolos
+DOCKER_IMAGE_CIRCLECI=zondax/circleci
+DOCKER_IMAGE_RUSTCI=zondax/rust-ci
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 
@@ -25,6 +27,8 @@ build:
 	cd qemuv8  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV8) .
 	cd bolos-app-build  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_BUILDER) .
 	cd bolos-app-emu  && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BOLOS_EMU) .
+	cd circleci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_CIRCLECI) .
+	cd rust-ci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_RUSTCI) .
 
 publish: build
 	docker login
@@ -34,6 +38,8 @@ publish: build
 	docker push $(DOCKER_IMAGE_QEMUV8)
 	docker push $(DOCKER_IMAGE_BOLOS_BUILDER)
 	docker push $(DOCKER_IMAGE_BOLOS_EMU)
+	docker push $(DOCKER_IMAGE_CIRCLECI)
+	docker push $(DOCKER_IMAGE_RUSTCI)
 
 pull:
 	docker pull $(DOCKER_IMAGE_BASE)
@@ -42,6 +48,8 @@ pull:
 	docker pull $(DOCKER_IMAGE_QEMUV8)
 	docker pull $(DOCKER_IMAGE_BOLOS_BUILDER)
 	docker pull $(DOCKER_IMAGE_BOLOS_EMU)
+	docker pull $(DOCKER_IMAGE_CIRCLECI)
+	docker pull $(DOCKER_IMAGE_RUSTCI)
 
 define run_docker
 	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) --rm \
@@ -71,3 +79,9 @@ shell_bolos_build: build
 
 shell_bolos_emu: build
 	$(call run_docker,$(DOCKER_IMAGE_BOLOS_EMU),/bin/bash)
+
+shell_circleci: build
+	$(call run_docker,$(DOCKER_IMAGE_CIRCLECI),/bin/bash)
+
+shell_rust-ci: build
+	$(call run_docker,$(DOCKER_IMAGE_RUSTCI),/bin/bash)
