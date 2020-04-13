@@ -32,7 +32,7 @@ RUN apt-get update && \
 # Install Python
 RUN apt-get update && apt-get -y install python3 python3-pip
 RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN pip3 install -U setuptools ledgerblue pillow Flask
+RUN pip3 install -U setuptools ledgerblue pillow
 
 # Speculos dependencies
 RUN apt-get update && apt-get -y install qemu-user-static python3-pyqt5 python3-construct \

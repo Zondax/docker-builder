@@ -36,11 +36,9 @@ RUN apt-get update && apt-get -y install python3 python3-pip
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN pip3 install -U setuptools ledgerblue pillow
 
-# Speculos dependencies
-RUN apt-get update && apt-get -y install qemu-user-static python3-pyqt5 python3-construct python3-mnemonic python3-pyelftools gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gdb-multiarch libvncserver-dev
-
 # Create zondax user
-RUN adduser --disabled-password --gecos "" -u 1000 zondax
+ARG ZONDAX_USERID
+RUN adduser --disabled-password --gecos "" -u $ZONDAX_USERID zondax
 RUN echo "zondax ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 WORKDIR /home/zondax
 
@@ -54,34 +52,6 @@ RUN go get -u -v github.com/tcnksm/ghr
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi
-# RUN su - zondax -c ". /home/zondax/.cargo/env && rustup toolchain install nightly"
-# RUN su - zondax -c ". /home/zondax/.cargo/env && rustup target add --toolchain nightly thumbv6m-none-eabi"
-
-# Speculos - use patched fork
-RUN git clone https://github.com/ZondaX/speculos.git
-RUN mkdir -p /home/zondax/speculos/build
-RUN cd /home/zondax/speculos && cmake -Bbuild -H. -DWITH_VNC=1
-RUN make -C /home/zondax/speculos/build/
-
-# Patch proxy to connect to all interfaces
-RUN sed -i "s/HOST = '127.0.0.1'/HOST = '0.0.0.0'/g" speculos/tools/ledger-live-http-proxy.py
-
-# Open TCP ports
-# gdb
-EXPOSE 1234/tcp
-EXPOSE 1234/udp
-# device keyboard
-EXPOSE 1235/tcp
-EXPOSE 1235/udp
-# APDU RAW
-EXPOSE 9999/tcp
-EXPOSE 9999/udp
-# HTTP APDU PROXY
-EXPOSE 9998/tcp
-EXPOSE 9998/udp
-# HTTP ZONDPECULOS CONTROL
-EXPOSE 9997/tcp
-EXPOSE 9997/udp
 
 # ENV
 RUN mkdir -p /home/zondax/.ccache

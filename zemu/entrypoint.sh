@@ -3,7 +3,7 @@ trap "exit" SIGTERM SIGINT
 
 echo
 echo "--------------------------------------"
-echo "Zondax BOLOS container - zondax.ch"
+echo "Zemu container - zondax.ch"
 echo "--------------------------------------"
 echo
 
