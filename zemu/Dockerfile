@@ -16,17 +16,14 @@
 #Download base ubuntu image
 FROM ubuntu:18.04
 RUN apt-get update && \
-    apt-get -y install build-essential ccache git wget sudo udev zip \
+    apt-get -y install build-essential git wget sudo udev zip \
                        curl cmake software-properties-common
-
-# udev rules
-ADD 20-hw1.rules /etc/udev/rules.d/20-hw1.rules
 
 RUN dpkg --add-architecture i386
 RUN apt-get update && \
-    apt-get -y install libudev-dev libusb-1.0-0-dev && \
-    apt-get -y install libc6:i386 libncurses5:i386 libstdc++6:i386 libc6-dev-i386 -y > /dev/null && \
-    apt-get -y install binutils-arm-none-eabi
+    apt-get -y install libudev-dev libusb-1.0-0-dev 
+    # apt-get -y install libc6:i386 libncurses5:i386 libstdc++6:i386 libc6-dev-i386 -y > /dev/null && \
+    # apt-get -y install binutils-arm-none-eabi
 
 
 # Install Python
@@ -71,20 +68,14 @@ EXPOSE 9999/udp
 # HTTP APDU PROXY
 EXPOSE 9998/tcp
 EXPOSE 9998/udp
-# HTTP ZONDPECULOS CONTROL
-EXPOSE 9997/tcp
-EXPOSE 9997/udp
 # RFB
 EXPOSE 8001/tcp
 EXPOSE 8001/udp
 
 # ENV
-RUN mkdir -p /home/zondax/.ccache
-RUN echo "cache_dir = /project/.ccache" > /home/zondax/.ccache/ccache.conf
-
-ADD zondpeculos-service.py /home/zondax/zondpeculos-service.py
-RUN sudo chmod a+x /home/zondax/zondpeculos-service.py
 ADD entrypoint.sh /home/zondax/entrypoint.sh
+
+RUN pip3 install -U jsonschema
 
 # START SCRIPT
 ENTRYPOINT ["/home/zondax/entrypoint.sh"]

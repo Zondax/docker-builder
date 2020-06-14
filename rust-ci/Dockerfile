@@ -21,6 +21,11 @@ ENV SCCACHE_CACHE_SIZE 1G
 
 RUN rustup component add clippy
 RUN cargo install cargo-audit
+RUN cargo install cargo-tree
+RUN cargo install cargo-license
+RUN cargo install cargo-outdated
+RUN cargo install cargo-watch https
+RUN cargo install wasm-pack
 
 ENV DEBIAN_FRONTEND noninteractive
 

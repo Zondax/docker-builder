@@ -1,7 +1,5 @@
 DOCKER_IMAGE_PREFIX=zondax/builder
 DOCKER_IMAGE_BASE=${DOCKER_IMAGE_PREFIX}-base
-DOCKER_IMAGE_QEMUV7=${DOCKER_IMAGE_PREFIX}-qemuv7
-DOCKER_IMAGE_QEMUV8=${DOCKER_IMAGE_PREFIX}-qemuv8
 DOCKER_IMAGE_YOCTO=${DOCKER_IMAGE_PREFIX}-yocto
 DOCKER_IMAGE_BOLOS=${DOCKER_IMAGE_PREFIX}-bolos
 DOCKER_IMAGE_BOLOS_1001=${DOCKER_IMAGE_PREFIX}-bolos-1001
@@ -21,17 +19,13 @@ endif
 
 default: build
 
-build: build_base build_yocto build_qemuv7 build_qemuv8 build_bolos build_bolos_1001 \
+build: build_base build_yocto build_bolos build_bolos_1001 \
        build_zemu build_circleci build_rustci
 
 build_base:
 	cd base && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_BASE) .
 build_yocto:
 	cd yocto && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_YOCTO) .
-build_qemuv7:
-	cd qemuv7 && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV7) .
-build_qemuv8:
-	cd qemuv8 && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_QEMUV8) .
 build_bolos:
 	cd bolos && docker build --rm -f Dockerfile --build-arg ZONDAX_USERID=1000 -t $(DOCKER_IMAGE_BOLOS) .
 build_bolos_1001:
@@ -43,22 +37,35 @@ build_circleci:
 build_rustci:
 	cd rust-ci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_RUSTCI) .
 
-publish: build
+publish_login:
 	docker login
+publish_base:
 	docker push $(DOCKER_IMAGE_BASE)
+publish_yocto:
 	docker push $(DOCKER_IMAGE_YOCTO)
-	docker push $(DOCKER_IMAGE_QEMUV7)
-	docker push $(DOCKER_IMAGE_QEMUV8)
+publish_bolos:
 	docker push $(DOCKER_IMAGE_BOLOS)
+publish_bolos_1001:
 	docker push $(DOCKER_IMAGE_BOLOS_1001)
+publish_zemu:
 	docker push $(DOCKER_IMAGE_ZEMU)
+publish_circleci:
+	docker push $(DOCKER_IMAGE_CIRCLECI)
+publish_rustci:
 	docker push $(DOCKER_IMAGE_RUSTCI)
+
+publish: publish_login
+publish: publish_base
+publish: publish_yocto
+publish: publish_bolos
+publish: publish_bolos_1001
+publish: publish_zemu
+publish: publish_circleci
+publish: publish_rustci
 
 pull:
 	docker pull $(DOCKER_IMAGE_BASE)
 	docker pull $(DOCKER_IMAGE_YOCTO)
-	docker pull $(DOCKER_IMAGE_QEMUV7)
-	docker pull $(DOCKER_IMAGE_QEMUV8)
 	docker pull $(DOCKER_IMAGE_BOLOS)
 	docker pull $(DOCKER_IMAGE_BOLOS_1001)
 	docker pull $(DOCKER_IMAGE_ZEMU)
@@ -92,12 +99,6 @@ shell_base: build_base
 
 shell_yocto: build_yocto
 	$(call run_docker,$(DOCKER_IMAGE_YOCTO),zsh)
-
-shell_qemuv7: build_qemuv7
-	$(call run_docker,$(DOCKER_IMAGE_QEMUV7),zsh)
-
-shell_qemuv8: build_qemuv8
-	$(call run_docker,$(DOCKER_IMAGE_QEMUV8),zsh)
 
 shell_bolos: build_bolos
 	$(call run_docker,$(DOCKER_IMAGE_BOLOS),/bin/bash)

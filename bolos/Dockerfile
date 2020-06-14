@@ -16,7 +16,7 @@
 #Download base ubuntu image
 FROM ubuntu:18.04
 RUN apt-get update && \
-    apt-get -y install build-essential ccache golang-go git wget sudo udev zip curl cmake software-properties-common
+    apt-get -y install build-essential ccache golang-go git wget sudo udev zip curl cmake software-properties-common afl
 
 # udev rules
 ADD 20-hw1.rules /etc/udev/rules.d/20-hw1.rules
