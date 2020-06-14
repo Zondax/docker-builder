@@ -14,9 +14,15 @@
 #   limitations under the License.
 #*******************************************************************************
 #Download base ubuntu image
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update && \
-    apt-get -y install build-essential ccache golang-go git wget sudo udev zip curl cmake software-properties-common afl
+    apt-get -y install build-essential ccache golang-go git wget sudo udev zip \
+    curl cmake software-properties-common afl++ apt-utils
+
+# Install Python
+RUN apt-get update && apt-get -y install python3 python3-pip python-is-python3
 
 # udev rules
 ADD 20-hw1.rules /etc/udev/rules.d/20-hw1.rules
@@ -27,14 +33,12 @@ RUN apt-get update && \
     apt-get -y install libc6:i386 libncurses5:i386 libstdc++6:i386 libc6-dev-i386 -y > /dev/null && \
     apt-get -y install binutils-arm-none-eabi
 
+# Install Python dependencies
+RUN pip3 install -U setuptools ledgerblue pillow
+
 # ARM compilers
 ADD install_compiler.sh /tmp/install_compiler.sh
 RUN /tmp/install_compiler.sh
-
-# Install Python
-RUN apt-get update && apt-get -y install python3 python3-pip
-RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN pip3 install -U setuptools ledgerblue pillow
 
 # Create zondax user
 ARG ZONDAX_USERID
