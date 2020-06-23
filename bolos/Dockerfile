@@ -34,7 +34,7 @@ RUN apt-get update && \
     apt-get -y install binutils-arm-none-eabi
 
 # Install Python dependencies
-RUN pip3 install -U setuptools ledgerblue pillow
+RUN pip3 install -U setuptools ledgerblue pillow conan
 
 # ARM compilers
 ADD install_compiler.sh /tmp/install_compiler.sh
@@ -56,6 +56,11 @@ RUN go get -u -v github.com/tcnksm/ghr
 # Install Rust
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi
+
+# Install rust 1.43 (required by zcash app)
+RUN . /home/zondax/.cargo/env && rustup toolchain install 1.43.0
+RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.43.0
+RUN . /home/zondax/.cargo/env && rustup default 1.43.0
 
 # ENV
 RUN mkdir -p /home/zondax/.ccache
