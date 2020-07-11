@@ -15,26 +15,35 @@
 #*******************************************************************************
 FROM circleci/rust:latest
 
-RUN cargo install sccache
-ENV RUSTC_WRAPPER sccache
-ENV SCCACHE_CACHE_SIZE 1G
+ENV DEBIAN_FRONTEND noninteractive
+RUN sudo apt-get update && \
+    sudo apt-get install -y curl apt-utils
+
+RUN rustc --version
 
 RUN rustup component add clippy
+RUN rustup component add rustfmt
+RUN cargo install sccache
 RUN cargo install cargo-audit
-RUN cargo install cargo-tree
-RUN cargo install cargo-license
-RUN cargo install cargo-outdated
-RUN cargo install cargo-watch https
 RUN cargo install wasm-pack
 
-ENV DEBIAN_FRONTEND noninteractive
+# Add fixed 1.43 too
+RUN rustup toolchain install 1.43.0
+RUN rustup component add rustfmt --toolchain 1.43.0
+RUN rustup component add clippy --toolchain 1.43.0
+RUN cargo +1.43.0 install sccache
+RUN cargo +1.43.0 install cargo-audit
+RUN cargo +1.43.0 install wasm-pack
+RUN cargo +1.43.0 install cargo-tree
 
 # Install latest node
 RUN sudo curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+RUN sudo apt-get update && sudo apt-get install -y nodejs yarn
 
-RUN sudo apt-get update && \
-    sudo apt-get install -y nodejs curl yarn apt-utils
-
+RUN yarn --version
 RUN sudo yarn global add n
 RUN sudo n latest -q
+
+ENV RUSTC_WRAPPER sccache
+ENV SCCACHE_CACHE_SIZE 1G
