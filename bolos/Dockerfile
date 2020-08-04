@@ -1,5 +1,5 @@
 #*******************************************************************************
-#    (c) 2019 ZondaX GmbH
+#    (c) 2019 Zondax GmbH
 # 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
     apt-get -y install build-essential ccache golang-go git wget sudo udev zip \
-    curl cmake software-properties-common afl++ apt-utils
+    curl cmake software-properties-common afl++ apt-utils coreutils
 
 # Install Python
 RUN apt-get update && apt-get -y install python3 python3-pip python-is-python3
@@ -38,6 +38,7 @@ RUN pip3 install -U setuptools ledgerblue pillow conan
 
 # ARM compilers
 ADD install_compiler.sh /tmp/install_compiler.sh
+RUN echo "5811228bf42074da1574d530059b55a4fe2a8730762ce14252113a500259647d  /tmp/install_compiler.sh" | sha256sum --check 
 RUN /tmp/install_compiler.sh
 
 # Create zondax user
