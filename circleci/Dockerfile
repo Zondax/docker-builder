@@ -1,5 +1,5 @@
 #*******************************************************************************
-#    (c) 2019 ZondaX GmbH
+#    (c) 2019 Zondax GmbH
 # 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #Download base ubuntu image
 FROM ubuntu:18.04
 RUN apt-get update && \
-    apt-get -y install build-essential git sudo wget cmake libssl-dev libgmp-dev autoconf libtool
+    apt-get -y install build-essential git sudo wget cmake libssl-dev libgmp-dev autoconf libtool clang gcc
     
 RUN adduser --disabled-password --gecos "" -u 1000 test
 RUN echo "test ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -24,4 +24,4 @@ WORKDIR /home/test
 
 # Python
 RUN apt-get update && apt-get -y install python-pip
-RUN pip install -U setuptools conan
+RUN pip install -U setuptools conan cmake

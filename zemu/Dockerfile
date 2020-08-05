@@ -1,5 +1,5 @@
 #*******************************************************************************
-#    (c) 2020 ZondaX GmbH
+#    (c) 2020 Zondax GmbH
 # 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -22,9 +22,6 @@ RUN apt-get update && \
 RUN dpkg --add-architecture i386
 RUN apt-get update && \
     apt-get -y install libudev-dev libusb-1.0-0-dev 
-    # apt-get -y install libc6:i386 libncurses5:i386 libstdc++6:i386 libc6-dev-i386 -y > /dev/null && \
-    # apt-get -y install binutils-arm-none-eabi
-
 
 # Install Python
 RUN apt-get update && apt-get -y install python3 python3-pip
@@ -41,13 +38,13 @@ RUN adduser --disabled-password --gecos "" -u 1000 zondax
 RUN echo "zondax ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 WORKDIR /home/zondax
 
-
 ####################################
 ####################################
 USER zondax
 
 # Speculos - use patched fork
-RUN git clone -b dev https://github.com/ZondaX/speculos.git
+RUN git clone -b dev https://github.com/Zondax/speculos.git
+RUN cd /home/zondax/speculos && git checkout 7aabd572d77648438d8faf122fedf60c190453cc
 RUN mkdir -p /home/zondax/speculos/build
 RUN cd /home/zondax/speculos && cmake -Bbuild -H. -DWITH_VNC=1
 RUN make -C /home/zondax/speculos/build/
