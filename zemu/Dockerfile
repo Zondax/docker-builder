@@ -31,7 +31,8 @@ RUN pip3 install -U setuptools ledgerblue pillow
 # Speculos dependencies
 RUN apt-get update && apt-get -y install qemu-user-static python3-pyqt5 python3-construct \
                                  python3-mnemonic python3-pyelftools gcc-arm-linux-gnueabihf \
-                                 libc6-dev-armhf-cross gdb-multiarch libvncserver-dev
+                                 libc6-dev-armhf-cross gdb-multiarch libvncserver-dev \
+                                 mesa-utils and libgl1-mesa-glx
 
 # Create zondax user
 RUN adduser --disabled-password --gecos "" -u 1000 zondax

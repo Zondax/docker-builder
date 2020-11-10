@@ -47,7 +47,7 @@ publish_bolos:
 	docker push $(DOCKER_IMAGE_BOLOS)
 publish_bolos_1001:
 	docker push $(DOCKER_IMAGE_BOLOS_1001)
-publish_zemu:
+publish_zemu: build_zemu
 	docker push $(DOCKER_IMAGE_ZEMU)
 publish_circleci:
 	docker push $(DOCKER_IMAGE_CIRCLECI)
