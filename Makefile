@@ -54,6 +54,7 @@ publish_circleci: build_circleci
 publish_rustci: build_rustci
 	docker push $(DOCKER_IMAGE_RUSTCI)
 
+publish: build
 publish: publish_login
 publish: publish_base
 publish: publish_yocto
