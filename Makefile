@@ -39,19 +39,19 @@ build_rustci:
 
 publish_login:
 	docker login
-publish_base:
+publish_base: build_base
 	docker push $(DOCKER_IMAGE_BASE)
-publish_yocto:
+publish_yocto: build_yocto
 	docker push $(DOCKER_IMAGE_YOCTO)
-publish_bolos:
+publish_bolos: build_bolos
 	docker push $(DOCKER_IMAGE_BOLOS)
-publish_bolos_1001:
+publish_bolos_1001: build_bolos_1001
 	docker push $(DOCKER_IMAGE_BOLOS_1001)
 publish_zemu: build_zemu
 	docker push $(DOCKER_IMAGE_ZEMU)
-publish_circleci:
+publish_circleci: build_circleci
 	docker push $(DOCKER_IMAGE_CIRCLECI)
-publish_rustci:
+publish_rustci: build_rustci
 	docker push $(DOCKER_IMAGE_RUSTCI)
 
 publish: publish_login

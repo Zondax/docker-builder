@@ -36,6 +36,15 @@ RUN cargo +1.43.0 install cargo-audit
 RUN cargo +1.43.0 install wasm-pack
 RUN cargo +1.43.0 install cargo-tree
 
+# Add fixed 1.47 too
+RUN rustup toolchain install 1.47.0
+RUN rustup component add rustfmt --toolchain 1.47.0
+RUN rustup component add clippy --toolchain 1.47.0
+RUN cargo +1.47.0 install sccache
+RUN cargo +1.47.0 install cargo-audit
+RUN cargo +1.47.0 install wasm-pack
+RUN cargo +1.47.0 install cargo-tree
+
 # Install latest node
 RUN sudo curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
