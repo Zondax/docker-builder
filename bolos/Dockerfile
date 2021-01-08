@@ -68,6 +68,11 @@ RUN . /home/zondax/.cargo/env && rustup toolchain install 1.47.0
 RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.47.0
 RUN . /home/zondax/.cargo/env && rustup default 1.47.0
 
+# Install rust 1.49 (required by substrate apps)
+RUN . /home/zondax/.cargo/env && rustup toolchain install 1.49.0
+RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.49.0
+RUN . /home/zondax/.cargo/env && rustup default 1.49.0
+
 # ENV
 RUN mkdir -p /home/zondax/.ccache
 RUN echo "cache_dir = /project/.ccache" > /home/zondax/.ccache/ccache.conf
