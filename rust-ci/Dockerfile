@@ -27,33 +27,6 @@ RUN cargo install sccache
 RUN cargo install cargo-audit
 RUN cargo install wasm-pack
 
-# Add fixed 1.43
-RUN rustup toolchain install 1.43.0
-RUN rustup component add rustfmt --toolchain 1.43.0
-RUN rustup component add clippy --toolchain 1.43.0
-RUN cargo +1.43.0 install sccache
-RUN cargo +1.43.0 install cargo-audit
-RUN cargo +1.43.0 install wasm-pack
-RUN cargo +1.43.0 install cargo-tree
-
-# Add fixed 1.44
-RUN rustup toolchain install 1.44.0
-RUN rustup component add rustfmt --toolchain 1.44.0
-RUN rustup component add clippy --toolchain 1.44.0
-RUN cargo +1.44.0 install sccache
-RUN cargo +1.44.0 install cargo-audit
-RUN cargo +1.44.0 install wasm-pack
-RUN cargo +1.44.0 install cargo-tree
-
-# Add fixed 1.47
-RUN rustup toolchain install 1.47.0
-RUN rustup component add rustfmt --toolchain 1.47.0
-RUN rustup component add clippy --toolchain 1.47.0
-RUN cargo +1.47.0 install sccache
-RUN cargo +1.47.0 install cargo-audit
-RUN cargo +1.47.0 install wasm-pack
-RUN cargo +1.47.0 install cargo-tree
-
 # Add fixed 1.49
 RUN rustup toolchain install 1.49.0
 RUN rustup component add rustfmt --toolchain 1.49.0

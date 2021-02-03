@@ -1,5 +1,5 @@
 #*******************************************************************************
-#    (c) 2019 Zondax GmbH
+#    (c) 2019-2021 Zondax GmbH
 # 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -41,43 +41,32 @@ ADD install_compiler.sh /tmp/install_compiler.sh
 RUN echo "5811228bf42074da1574d530059b55a4fe2a8730762ce14252113a500259647d  /tmp/install_compiler.sh" | sha256sum --check 
 RUN /tmp/install_compiler.sh
 
+ADD install_rust.sh /tmp/install_rust.sh
+
 # Create zondax user
-ARG ZONDAX_USERID
-RUN adduser --disabled-password --gecos "" -u $ZONDAX_USERID zondax
+RUN adduser --disabled-password --gecos "" -u 1000 zondax
 RUN echo "zondax ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN adduser --disabled-password --gecos "" -u 1001 zondax_circle
+RUN echo "zondax_circle ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN adduser --disabled-password --gecos "" -u 501 zondax_mac
+RUN echo "zondax_mac ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+ADD install_user.sh /tmp/install_user.sh
+
+####################################
+####################################
+WORKDIR /home/zondax_circle
+USER zondax_circle
+RUN /tmp/install_user.sh
+
+WORKDIR /home/zondax_mac
+USER zondax_mac
+RUN /tmp/install_user.sh
+
 WORKDIR /home/zondax
-
-####################################
-####################################
 USER zondax
-
-# Install ghr
-RUN go get -u -v github.com/tcnksm/ghr
-
-# Install Rust
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi
-
-# Install rust 1.43 (required by zcash app)
-RUN . /home/zondax/.cargo/env && rustup toolchain install 1.43.0
-RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.43.0
-RUN . /home/zondax/.cargo/env && rustup default 1.43.0
-
-# Install rust 1.47 (required by zcash app)
-RUN . /home/zondax/.cargo/env && rustup toolchain install 1.47.0
-RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.47.0
-RUN . /home/zondax/.cargo/env && rustup default 1.47.0
-
-# Install rust 1.49 (required by substrate apps)
-RUN . /home/zondax/.cargo/env && rustup toolchain install 1.49.0
-RUN . /home/zondax/.cargo/env && rustup target add thumbv6m-none-eabi --toolchain 1.49.0
-RUN . /home/zondax/.cargo/env && rustup default 1.49.0
-
-# ENV
-RUN mkdir -p /home/zondax/.ccache
-RUN echo "cache_dir = /project/.ccache" > /home/zondax/.ccache/ccache.conf
-
-ADD entrypoint.sh /home/zondax/entrypoint.sh
+RUN /tmp/install_user.sh
 
 # START SCRIPT
-ENTRYPOINT ["/home/zondax/entrypoint.sh"]
+ADD entrypoint.sh /tmp/entrypoint.sh
+ENTRYPOINT ["/tmp/entrypoint.sh"]
