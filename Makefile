@@ -31,7 +31,7 @@ build_bolos:
 build_bolos_1001:
 	cd bolos && docker build --rm -f Dockerfile --build-arg ZONDAX_USERID=1001 -t  $(DOCKER_IMAGE_BOLOS_1001) .
 build_zemu:
-	cd zemu && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_ZEMU) .
+	cd zemu && docker build -f Dockerfile -t $(DOCKER_IMAGE_ZEMU) .
 build_circleci:
 	cd circleci && docker build --rm -f Dockerfile -t $(DOCKER_IMAGE_CIRCLECI) .
 build_rustci:
@@ -74,7 +74,7 @@ pull:
 	docker pull $(DOCKER_IMAGE_RUSTCI)
 
 define run_docker
-	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) --rm \
+	docker run $(TTY_SETTING) $(INTERACTIVE_SETTING) \
 	--privileged \
 	-u $(shell id -u):$(shell id -g) \
 	-v $(shell pwd):/project \
@@ -108,7 +108,7 @@ shell_bolos_1001: build_bolos_1001
 	$(call run_docker_1001,$(DOCKER_IMAGE_BOLOS_1001),/bin/bash)
 
 shell_zemu: build_zemu
-	$(call run_docker,$(DOCKER_IMAGE_|EMU),/bin/bash)
+	$(call run_docker,$(DOCKER_IMAGE_ZEMU),/bin/bash)
 
 shell_circleci: build_circleci
 	$(call run_docker,$(DOCKER_IMAGE_CIRCLECI),/bin/bash)
