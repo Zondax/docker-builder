@@ -44,8 +44,8 @@ WORKDIR /home/zondax
 USER zondax
 
 # Speculos - use patched fork
-RUN git clone -b master https://github.com/Zondax/speculos.git
-RUN cd /home/zondax/speculos && git checkout 98e2420ff03968e5aedec64e01020dcf03e7832e
+RUN git clone -b master https://github.com/LedgerHQ/speculos.git
+RUN cd /home/zondax/speculos && git checkout 97abf63ce316235066a1f2df0abda212ff7f7027
 RUN mkdir -p /home/zondax/speculos/build
 RUN cd /home/zondax/speculos && cmake -Bbuild -H. -DWITH_VNC=1
 RUN make -C /home/zondax/speculos/build/
