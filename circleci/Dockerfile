@@ -14,14 +14,15 @@
 #   limitations under the License.
 #*******************************************************************************
 #Download base ubuntu image
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update && \
-    apt-get -y install build-essential git sudo wget cmake libssl-dev libgmp-dev autoconf libtool clang gcc
+    apt-get -y install build-essential git sudo wget cmake libssl-dev libgmp-dev autoconf libtool clang gcc python3 python3-pip python-is-python3
     
 RUN adduser --disabled-password --gecos "" -u 1000 test
 RUN echo "test ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 WORKDIR /home/test
 
 # Python
-RUN apt-get update && apt-get -y install python-pip
-RUN pip install -U setuptools conan cmake
+RUN pip3 install -U setuptools conan cmake
